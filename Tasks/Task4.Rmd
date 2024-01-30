@@ -1,0 +1,85 @@
+---
+title: "Task 4"
+author: "Lúa Arconada Manteca & Víctor Collado Fernández"
+date: "05/10/2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise i
+
+Write a program in R for numerically computing both gamma distribution parameters MLE estimators
+
+```{r, comment=""}
+# Simulation of the sample
+shape = 2
+scale = 1.5
+set.seed(123456)
+data = rgamma(n=1000, shape=shape, scale=scale)
+
+# Create the -logLikehood function
+gloglik = function(param){
+  a = param[1]
+  b = param[2]
+  n = length(data)
+  loglike = (a-1)*sum(log(data))-(1/b)*sum(data)-n*a*log(b)-n*log(gamma(a))
+  return(-loglike)
+}
+
+# Apply the command optim() to compute the parameters numerically
+mle = optim(par=c(0.1,0.1), fn=gloglik, hessian = TRUE)
+mle$par
+```
+
+
+# Exercise 2
+
+Make a short summary of the main characteristics of the library "MaxLik".
+
+MaxLik is an R package designed for maximum likelihood estimation (MLE) in statistical modelling. It includes tools for non-linear optimization, such as the BHHH algorithm, variance-covariance matrix and standard errors, with a primary focus on non-linear optimization from a maximum likelihood perspective.
+
+MaxLik is a well-documented package, making it highly accessible to users who wish to understand its functionalities and apply them to their statistical modelling tasks. Furthermore, the package is actively developed, continuously improving through updates.
+
+In its simplest form, the package takes two arguments: the log-likelihood function and a vector or initial parameter. The output is an object of the ‘maxLik’ class, equipped with convenient methods such as ‘summary’, ‘coef ‘ and ‘stdEr’. Here, ‘summary’ generates a summary report of the MLE estimation results, including various statistics and information related to the estimated model, such as the MLE of model parameters, standard errors of parameter estimates, likelihood ratio tests for model comparison… ‘Coef’ extracts the estimated coefficients or parameters from the MLE results and ‘stdEr’ refers to the standard errors associated with the estimated model parameters.
+Additionally, MaxLik boasts several other features, which we’ll briefly describe.
+
+As we said, MaxLik is an R package primarily designed for maximum likelihood estimation (MLE) in statistical modelling. It has the ability to estimate model parameters using this MLE method, allowing researchers and analysts to find the most likely values for model parameters, thereby enhancing the accuracy of their statistical models.
+
+Another notable aspect of MaxLik is its flexibility in model specification. Users can specify a wide range of statistical models, which is particularly advantageous for researchers across various fields, such as finance, economics and social sciences.
+
+In addition to MLE and model flexibility, MaxLik also offers a variety of optimization algorithms, including the Newton-Raphson and Broyden-Goldfarb-Shanno algorithms. These optimization techniques contribute to the precision of statistical modelling by enhancing the package’s capability to find optimal parameter estimates.
+
+Moreover, MaxLik provides tools for model diagnostics that enable users to assess the goodness-of-fit of their estimated models and evaluate the validity of underlying assumptions. 
+
+Finally, MaxLik offers robust standard errors, a vital component for addressing issues such as heteroscedasticity (which is when the spread of data points around the regression line changes as you move along the values of the independent variables) and other violations of classical assumptions.
+
+All in all, MaxLik is a valuable library for conducting maximum likelihood estimation in R, especially in fields where statistical modelling and parameter estimation are common practices.
+
+# Exercise 3
+
+Apply the package "MaxLik" to calculate the MLE of the previous gamma-distributed data  
+
+```{r, comment=""}
+library(maxLik)
+
+# Create the logLikehood function (positive in this case)
+gloglikpos = function(param){
+  a = param[1]
+  b = param[2]
+  n = length(data)
+  loglike = (a-1)*sum(log(data))-(1/b)*sum(data)-n*a*log(b)-n*log(gamma(a))
+  return(loglike)
+}
+
+# Apply maxLik() command to get the estimators
+mle2 = maxLik(logLik = gloglikpos, start = c(0.1,0.1))
+summary(mle2) 
+```
+
+In the estimate, we obtain the corresponding Maximum Likelihood Estimates (MLE) for the parameters of the gamma distribution. We also obtain their corresponding standard errors, t-values, and p-values, which are useful for making inferences with the corresponding MLE.
+
+Both MLEs are very similar. The main difference between using maxLik and computing it numerically is that when using the maxLik function, you will need the positive log-likelihood function instead of the negative log-likelihood function that you would use with the optim() command.
+

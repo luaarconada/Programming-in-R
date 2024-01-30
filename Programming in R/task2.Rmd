@@ -1,0 +1,163 @@
+---
+title: "Task 2"
+author: "Lúa Arconada Manteca & Víctor Collado Fernández"
+date: '30-09-2023'
+output:
+  word_document: default
+  html_document: default
+---
+
+# The apply() family
+
+The R Apply family allows R users to apply a function to elements of a vector, lists, matrices, arrays or data frames. We will explain the apply function family along with some of its related functions.
+
+## The apply() family
+
+These functions are loops without the explicit use of loop constructs like for() or while(). We have said that these functions are a way of applying a function to a list, vector, array... these functions can be aggregating, transforming or subsetting and vectorized functions. The apply() family consists of apply(), lapply(), sapply() and tapply().
+
+### Apply()
+
+Apply() operates on arrays (matrices are the special case of arrays with two dimensions) and follows the next structure: apply(x,margin,fun,...) where x is the array, margin is a variable defining how the function is applied ( if it's margin=1 it applies to rows, if it's a 2 it applies to its columns and if it's c(1,2) it applies to both) and fun is the function that we want to apply to x.
+
+Let's see an example:
+
+```{r apply}
+example1 = matrix(seq(1,24,2),nrow=4,ncol=6)
+example1
+apply_ex = apply(example1,2,sum)
+apply_ex
+
+```
+
+Here we first create a matrix called example_1 and print it and then we use apply() to sum the elements of its columns and print it afterwards.
+
+### Lapply()
+
+It works like the apply() function but lapply() can be used for data frames, lists or vectors and it returns a list with the same number of elements as objects that has passed it. It follows the next structure: lapply(x,fun,...) where x is our list or vector and fun is the function again.
+
+Let's see an example:
+
+```{r lapply}
+example2 = c(1,7,6,3)
+example2
+lapply_ex = lapply(example2,sqrt)
+lapply_ex
+
+```
+
+Here, we have calculated the square root of each element in a vector we created and named example2. And as we said, the lapply's output consists of the same number of elements as the number of elements that are in our initial vector.
+
+### Sapply()
+
+This function is similar to lapply() but aims to simplify the output to the most elementary data structure possible, which is why it is some times known as a wrapper function for lapply(). It follows the next structure: sapply(x,fun,...,simplify=TRUE, USE.NAMES=TRUE) where x is our vector, list...; fun is the function we want applied. If we write simplify=FALSE returns a list and if USE.NAMES=TRUE, if x is a character vector, it uses the names of x.
+
+Let's see an example:
+
+```{r sapply}
+example3 = list(A= 1:7, B=seq(2,88,7),c=matrix(seq(1,58,3),nrow=4,ncol=5))
+example3
+sapply_ex = sapply(example3,length,simplify=TRUE,USE.NAMES=TRUE)
+sapply_ex
+```
+
+Where we have first created our example3 which consists of a list, a sequence and a matrix. Then we have appllied sapply() to obtain the length of each of the elements of our example3 and the output is a list with three elements.
+
+### Tapply()
+
+It works like the apply() but it computes a measure like the mean, median, min,... or it can apply a function for each factor variable in a vector. It is very useful because we can create subset within our vector and then apply a function to each subset. It follows the next structure: tapply(x,index,fun,...,default=NA,simplify=TRUE) where x is again our vector that we can split, index is the list of factors of the same length and fun is again the function applied to the factors.
+
+Let's see an example:
+
+```{r tapply1}
+set.seed(5)
+example4 = data.frame(books=round(rnorm(15,sd=16,mean=25)),
+                      type=sample(1:5,size=15,replace=TRUE),
+                      bookshop=sample(paste('Bookshop',1:7),
+                                size=15,replace=TRUE))
+
+print(head(example4))
+```
+
+Here we have created a data frame with the number of books in 7 different bookshop divided in 5 types according to the genre.
+
+```{r tapply2}
+books = example4$books
+bookshops = example4$bookshop
+type = factor(example4$type,
+              labels = c('scifi','romance','classics','adventure','mistery'))
+books
+bookshops
+type
+tapply_ex = tapply(books,type,mean)
+tapply_ex
+```
+
+Here, we have created three lists: one for the 'Books' column, another for the 'Bookshop' column', and a third for the 'Type' column, where we've assigned names to each type of book depending to its genre. Then we have used tapply to compute the mean of books in each category.
+
+### Aggregate()
+
+This function is used to compute summary statistics for subsets of the data, which can be a data frame, a formula or a time series object. It follows the next structure when we work with a data frame: aggregate(x,by,fun,...,simplify=TRUE,drop=TRUE) where x is our object, by is the list of variables which are grouping elements and fun is once again the function we want to apply to x. Moreover, simplify=TRUE denotes whether to simplify results as much as possible or not and drop=TRUE indicates whether to drop unused combinations of grouping values or not.
+
+Let's see an example:
+
+```{r}
+example5= chickwts
+print(head(example5))
+aggregate_ex=aggregate(example5$weight,list(example5$feed),mean)
+aggregate_ex
+```
+
+Let's see an equivalent way with a different structure:
+
+```{r}
+aggregate_ex2=aggregate(weight~feed,data=example5,mean)
+aggregate_ex2
+```
+
+Here we have used one of the data frames included in R and named it example5. It consists of the weight of 71 chicks and what they are fed. Then we have used aggregate to compute the mean of the weight depending on what the chicks eat.
+
+### Split()
+
+This function, as the name implies, allows data to be divided into groups based on factor levels. It follows the next structure: split(x,f,drop=FALSE,sep=''.'',lex.order=FALSE,...) where x is our vector or data frame and f are the groups of class factor, vector or lists. In addition, drop=FALSE shows whether to drop unused levels or not, sep=''.'' indicates the character string to separate groups when f is a list and, finally, lex.order=FALSE describes whether the factor concatenation should be lexically ordered or not.
+
+Let's see an example:
+
+```{r}
+example6 = c(x=3,y=1,x=9,x=11,y=15,x=4,y=3)
+example6
+split_ex = split(example6,f=names(example6),sep=",",lex.order=TRUE)
+split_ex
+```
+
+### Sweep()
+
+The sweep() function allows to carry out various operations on a matrix's rows or columns. It follows the next syntax: sweep(x,margin,stats,fun) where x is the name of the matrix, margin is the margin on which it runs the function (1=rows, 2=columns), stat are the value/s to use in the function which is indicated with fun.
+
+Let's see an example:
+
+```{r}
+example7 = matrix(1:15,nrow=5,ncol=3)
+example7
+sweep_ex = sweep(example7, 1, c(1, 7, 2, 5, 10), '+')
+sweep_ex
+```
+
+First, we created a matrix, and then we used sweep to add values row by row. The first value of the vector c has been added to the first row, the second value to the second row and so on.
+
+### Rep()
+
+Finally, this function is often used in conjunction with apply() functions. It can be applied to a vector or a factor, x, in order to replicate its values a specified number of times. It follows the next structure: rep(x,times,each,length.out,...) where x is the vector or values that we want to repeat, times is an integer specifying the number of times our x is going to be repeated and each is an integer specifying how many times each element in x should be repeated. Furthermore, length.out is an optional argument that specifies the desired length of the output vector.
+
+Let's see some final examples:
+
+```{r}
+example8=c(1,2,3)
+rep_ex = rep(example8,times=2)
+rep_ex
+rep_ex2=rep(example8,times=2,each=2)
+rep_ex2
+rep_ex3=rep(example8,length.out=7)
+rep_ex3
+```
+
+Here, we have created using rep() three different vectors using different arguments in rep(). Firstly, just a vector repeating two times our initial vector example8. Secondly, repeating it twice but also duplicating each of its elements. Finally, replicating it till it reaches the length that we want which is 7.
